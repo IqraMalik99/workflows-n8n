@@ -1,0 +1,126 @@
+{
+  "name": "AI Voice Call to Email Automation Agent",
+  "nodes": [
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [0, 112],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "n8n-voice",
+        "responseMode": "responseNode"
+      }
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [224, 0],
+      "parameters": {
+        "promptType": "define",
+        "text": "=Email request:\nTo: {{$json.body.to}}\nMessage: {{$json.body.email}}\n\nReturn ONLY valid JSON with:\n{\n  \"to\": \"\",\n  \"subject\": \"\",\n  \"message\": \"\"\n}",
+        "options": {
+          "systemMessage": "You are an AI email assistant. Use contacts tool to find real emails. NEVER guess emails. If email not found, respond: CONTACT_NOT_FOUND. Always write professional emails and sign off as Iqra Malik."
+        }
+      }
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [208, 272],
+      "parameters": {
+        "model": "gpt-5-mini"
+      }
+    },
+    {
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [576, 112],
+      "parameters": {
+        "responseBody": "={{ $json }}"
+      }
+    },
+    {
+      "name": "ContactData",
+      "type": "n8n-nodes-base.googleContactsTool",
+      "typeVersion": 1,
+      "position": [400, 256],
+      "parameters": {
+        "operation": "getAll",
+        "fields": ["emailAddresses", "names"]
+      }
+    },
+    {
+      "name": "SendEmail",
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [528, 352],
+      "parameters": {
+        "sendTo": "={{ $fromAI('to') }}",
+        "subject": "={{ $fromAI('subject') }}",
+        "message": "={{ $fromAI('message') }}"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ContactData": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SendEmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false
+}
