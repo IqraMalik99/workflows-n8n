@@ -2,10 +2,6 @@
   "name": "RAG CHATBOT",
   "nodes": [
     {
-      "name": "Google Drive Trigger",
-      "type": "n8n-nodes-base.googleDriveTrigger",
-      "typeVersion": 1,
-      "position": [-384, 144],
       "parameters": {
         "pollTimes": {
           "item": [
@@ -17,152 +13,161 @@
         "triggerOn": "specificFolder",
         "folderToWatch": {
           "__rl": true,
-          "value": "REPLACE_WITH_FOLDER_ID",
-          "mode": "list"
+          "value": "REDACTED_GOOGLE_DRIVE_FOLDER_ID",
+          "mode": "list",
+          "cachedResultName": "N8N",
+          "cachedResultUrl": "REDACTED_FOLDER_URL"
         },
-        "event": "fileCreated",
+        "event": "={{ \"fileCreated\" }}",
         "options": {}
       },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [-384, 144],
+      "id": "REDACTED",
+      "name": "Google Drive Trigger",
       "credentials": {
         "googleDriveOAuth2Api": {
+          "id": "REDACTED",
           "name": "Google Drive OAuth2 API"
         }
       }
     },
     {
-      "name": "Download file",
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
       "type": "n8n-nodes-base.googleDrive",
       "typeVersion": 3,
       "position": [-160, 144],
-      "parameters": {
-        "operation": "download",
-        "fileId": "={{ $json.id }}",
-        "options": {}
-      },
+      "id": "REDACTED",
+      "name": "Download file",
       "credentials": {
         "googleDriveOAuth2Api": {
+          "id": "REDACTED",
           "name": "Google Drive OAuth2 API"
         }
       }
     },
     {
-      "name": "Pinecone Vector Store",
+      "parameters": {
+        "mode": "insert",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "ragchat-n8n",
+          "mode": "list",
+          "cachedResultName": "ragchat-n8n"
+        },
+        "options": {
+          "pineconeNamespace": "RAG"
+        }
+      },
       "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
       "typeVersion": 1.3,
       "position": [96, -64],
-      "parameters": {
-        "mode": "insert",
-        "pineconeIndex": "ragchat-n8n",
-        "options": {
-          "pineconeNamespace": "RAG"
-        }
-      },
+      "id": "REDACTED",
+      "name": "Pinecone Vector Store",
       "credentials": {
         "pineconeApi": {
+          "id": "REDACTED",
           "name": "Pinecone account"
         }
       }
     },
     {
-      "name": "Embeddings OpenAI",
+      "parameters": {},
       "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
       "typeVersion": 1.2,
       "position": [64, 160],
-      "parameters": {
-        "options": {}
-      },
+      "id": "REDACTED",
+      "name": "Embeddings OpenAI",
       "credentials": {
         "openAiApi": {
+          "id": "REDACTED",
           "name": "OpenAI API"
         }
       }
     },
     {
-      "name": "Default Data Loader",
+      "parameters": {
+        "textSplittingMode": "custom",
+        "options": {}
+      },
       "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
       "typeVersion": 1.1,
       "position": [192, 160],
-      "parameters": {
-        "dataType": "binary",
-        "textSplittingMode": "custom"
-      }
+      "id": "REDACTED",
+      "name": "Default Data Loader"
     },
     {
-      "name": "Text Splitter",
-      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
-      "typeVersion": 1,
-      "position": [272, 368],
       "parameters": {
         "chunkSize": 390,
         "chunkOverlap": 200
-      }
+      },
+      "id": "REDACTED",
+      "name": "Recursive Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [272, 368]
     },
     {
-      "name": "Chat Trigger",
+      "parameters": {},
       "type": "@n8n/n8n-nodes-langchain.chatTrigger",
       "typeVersion": 1.4,
       "position": [-384, 784],
-      "parameters": {}
+      "id": "REDACTED",
+      "name": "When chat message received",
+      "webhookId": "REDACTED"
     },
     {
-      "name": "AI Agent",
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a helpful assistant USE PINECONE DATABASE ALWAYS"
+        }
+      },
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [-128, 784],
-      "parameters": {
-        "options": {
-          "systemMessage": "You are a helpful assistant. ALWAYS USE PINECONE DATABASE."
-        }
-      }
+      "id": "REDACTED",
+      "name": "AI Agent"
     },
     {
-      "name": "OpenAI Chat Model",
+      "parameters": {
+        "model": {
+          "value": "gpt-5-mini"
+        },
+        "options": {}
+      },
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.3,
       "position": [-160, 1008],
-      "parameters": {
-        "model": "gpt-5-mini",
-        "options": {}
-      },
+      "id": "REDACTED",
+      "name": "OpenAI Chat Model",
       "credentials": {
         "openAiApi": {
-          "name": "OpenAI API"
-        }
-      }
-    },
-    {
-      "name": "Pinecone Tool",
-      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
-      "typeVersion": 1.3,
-      "position": [-32, 1008],
-      "parameters": {
-        "mode": "retrieve-as-tool",
-        "toolDescription": "USE THIS TO GET DATA",
-        "pineconeIndex": "ragchat-n8n",
-        "options": {
-          "pineconeNamespace": "RAG"
-        }
-      },
-      "credentials": {
-        "pineconeApi": {
-          "name": "Pinecone account"
-        }
-      }
-    },
-    {
-      "name": "Embeddings OpenAI 2",
-      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
-      "typeVersion": 1.2,
-      "position": [48, 1216],
-      "parameters": {
-        "options": {}
-      },
-      "credentials": {
-        "openAiApi": {
+          "id": "REDACTED",
           "name": "OpenAI API"
         }
       }
     }
   ],
-  "connections": {}
+  "connections": {},
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "REDACTED",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "REDACTED"
+  },
+  "id": "REDACTED",
+  "tags": []
 }
